@@ -1,6 +1,6 @@
 "name": "lldpd"
 "summary": "implementation of IEEE 802.1ab (LLDP)"
-"maintainer": "Ante Karamati\u0107 <ante.Karamatic@canonical.com>"
+"maintainer": "Ante Karamatić <ante.Karamatic@canonical.com>"
 "description": |
   LLDP is an industry standard protocol designed to supplant proprietary
   Link-Layer protocols such as Extreme's EDP (Extreme Discovery
