@@ -1,0 +1,28 @@
+"options":
+  "i40e-lldp-stop":
+    "type": "boolean"
+    "default": !!bool "True"
+    "description": |
+       "This allows control over Intel's i40e NIC driver. By default
+       i40e blocks userspace LLDP and does it on its own. Setting this
+       option to 'True' means charm will disable this functionality in
+       the NIC and do it within userspace."
+  "interfaces-regex":
+    "type": "string"
+    "default":
+    "description": |
+       "Which interfaces should lldpd announce details. If you want lldpd
+       to listen on multiple interfaces, set it here. Examples:
+       .
+       seth*,meth*
+       .
+       You can also use exclamation mark to exclude an interface:
+       .
+       eth*,!eth1
+       .
+       This way lldpd will listen on all eth* interfaces with an
+       exception of eth1."
+  "systemid-from-interface":
+    "type": "string"
+    "default":
+    "description": "Pull systemID from this interface"
