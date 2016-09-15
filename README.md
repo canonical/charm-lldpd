@@ -26,23 +26,11 @@ use on those is not recommended.
 
 # Configuration
 
-The configuration options will be listed on the charm store, however If you're
-making assumptions or opinionated decisions in the charm (like setting a default
-administrator password), you should detail that here so the user knows how to
-change it immediately, etc.
+By default LLDPd will listen on all interfaces and pick, more or less, a random
+systemid. Two given configuration options allow user to specify which interfaces
+will be used to broadcast LLDP data and which will be used for systemid.
 
-# Contact Information
-
-Though this will be listed in the charm store itself don't assume a user will
-know that, so include that information here:
-
-## Upstream Project Name
-
-  - Upstream website
-  - Upstream bug tracker
-  - Upstream mailing list or contact information
-  - Feel free to add things if it's useful for users
-
-
-[service]: http://example.com
-[icon guidelines]: https://jujucharms.com/docs/stable/authors-charm-icon
+One additional option, i40e-lldp-stop, is included because some Intel NICs
+block user-space LLDP generated data and instead broadcast their own. By setting
+this option to True (default), NIC's built-in LLDP daemon will be disabled, if
+such a NIC has been discovered on the system.
