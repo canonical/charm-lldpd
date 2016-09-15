@@ -9,6 +9,7 @@ switches and routers.
 Step by step instructions on using the charm:
 
 juju deploy lldpd
+
 juju add-relation lldpd application-on-physical-machine
 
 Being a subordinate charm it needs to be related to an application running
