@@ -57,6 +57,8 @@ def config_changed():
 
 def disable_i40e_lldp():
     path = '/sys/kernel/debug/i40e'
+    if not os.path.exists(path):
+        return True
     for nic in os.listdir(path):
         cmd = open('%s/%s/command' % (str(path),str(nic)), 'w')
         cmd.write('lldp stop')
