@@ -11,6 +11,9 @@
   SNMP subagent that can interface to an SNMP agent through AgentX
   protocol.  This daemon is also able to deal with CDP, SONMP, FDP and
   EDP protocol. It also handles LLDP-MED extension.
+"series":
+- "trusty"
+- "xenial"
 "tags":
 - "network"
 - "ops"
