@@ -29,7 +29,7 @@ from fnmatch import fnmatch
 
 import six
 
-CHARM_HELPERS_BRANCH = 'lp:charm-helpers'
+CHARM_HELPERS_REPO = 'https://github.com/juju/charm-helpers'
 
 
 def parse_config(conf_file):
@@ -39,10 +39,16 @@ def parse_config(conf_file):
     return yaml.load(open(conf_file).read())
 
 
-def clone_helpers(work_dir, branch):
+def clone_helpers(work_dir, repo):
     dest = os.path.join(work_dir, 'charm-helpers')
-    logging.info('Checking out %s to %s.' % (branch, dest))
-    cmd = ['bzr', 'checkout', '--lightweight', branch, dest]
+    logging.info('Cloning out %s to %s.' % (repo, dest))
+    branch = None
+    if '@' in repo:
+        repo, branch = repo.split('@', 1)
+    cmd = ['git', 'clone', '--depth=1']
+    if branch is not None:
+        cmd += ['--branch', branch]
+    cmd += [repo, dest]
     subprocess.check_call(cmd)
     return dest
 
@@ -191,14 +197,15 @@ def sync_helpers(include, src, dest, options=None):
                         inc, opts = extract_options(m, global_options)
                         sync(src, dest, '%s.%s' % (k, inc), opts)
 
+
 if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option('-c', '--config', action='store', dest='config',
                       default=None, help='helper config file')
     parser.add_option('-D', '--debug', action='store_true', dest='debug',
                       default=False, help='debug')
-    parser.add_option('-b', '--branch', action='store', dest='branch',
-                      help='charm-helpers bzr branch (overrides config)')
+    parser.add_option('-r', '--repository', action='store', dest='repo',
+                      help='charm-helpers git repository (overrides config)')
     parser.add_option('-d', '--destination', action='store', dest='dest_dir',
                       help='sync destination dir (overrides config)')
     (opts, args) = parser.parse_args()
@@ -217,10 +224,10 @@ if __name__ == '__main__':
     else:
         config = {}
 
-    if 'branch' not in config:
-        config['branch'] = CHARM_HELPERS_BRANCH
-    if opts.branch:
-        config['branch'] = opts.branch
+    if 'repo' not in config:
+        config['repo'] = CHARM_HELPERS_REPO
+    if opts.repo:
+        config['repo'] = opts.repo
     if opts.dest_dir:
         config['destination'] = opts.dest_dir
 
@@ -240,7 +247,7 @@ if __name__ == '__main__':
         sync_options = config['options']
     tmpd = tempfile.mkdtemp()
     try:
-        checkout = clone_helpers(tmpd, config['branch'])
+        checkout = clone_helpers(tmpd, config['repo'])
         sync_helpers(config['include'], checkout, config['destination'],
                      options=sync_options)
     except Exception as e:
