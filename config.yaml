@@ -21,7 +21,10 @@
        eth*,!eth1
        
        This way lldpd will listen on all eth* interfaces with an
-       exception of eth1."
+       exception of eth1.
+
+       By default this is set to None, which puts lldpd in listening
+       mode only."
   "systemid-from-interface":
     "type": "string"
     "default":
