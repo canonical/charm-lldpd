@@ -13,13 +13,13 @@
     "description": |
        "Which interfaces should lldpd announce details. If you want lldpd
        to listen on multiple interfaces, set it here. Examples:
-       
+
        seth*,meth*
-       
+
        You can also use exclamation mark to exclude an interface:
-       
+
        eth*,!eth1
-       
+
        This way lldpd will listen on all eth* interfaces with an
        exception of eth1.
 
