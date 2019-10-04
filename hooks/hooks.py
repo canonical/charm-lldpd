@@ -56,6 +56,8 @@ def config_changed():
         args.append('-C %s ' % str(configs['systemid-from-interface']))
     if 'interfaces-regex' in configs:
         args.append('-I %s ' % str(configs['interfaces-regex']))
+    if configs['enable-snmp']:
+        args.append('-x ')
     machine_id = os.environ['JUJU_MACHINE_ID']
     if machine_id:
         args.append('-S juju_machine_id=%s' % str(machine_id))

@@ -29,3 +29,7 @@
     "type": "string"
     "default":
     "description": "Pull systemID from this interface"
+  "enable-snmp":
+    "type": "boolean"
+    "default": False
+    "description": "Enable the SNMP agent for LLDPD"
