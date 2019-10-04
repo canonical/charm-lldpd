@@ -16,6 +16,8 @@
 - "trusty"
 - "xenial"
 - "bionic"
+- "cosmic"
+- "disco"
 "tags":
 - "network"
 - "ops"
