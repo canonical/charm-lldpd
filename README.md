@@ -6,7 +6,7 @@ switches and routers.
 
 # Usage
 
-Step by step instructions on using the charm:
+Start by installing the lldpd charm and relating it to another application:
 
 juju deploy lldpd
 

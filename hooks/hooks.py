@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import os
 import sys
 
@@ -28,8 +27,8 @@ def _add_path(path):
 
 _add_path(_parent)
 
-from charmhelpers.core import hookenv, host
-from charmhelpers import fetch
+from charmhelpers.core import hookenv, host  # noqa: E402
+from charmhelpers import fetch  # noqa: E402
 
 PACKAGES = ['lldpd']
 
@@ -38,15 +37,15 @@ hooks = hookenv.Hooks()
 
 @hooks.hook('install')
 def install():
-    hookenv.status_set('maintenance','Installing LLDP daemon')
+    hookenv.status_set('maintenance', 'Installing LLDP daemon')
     fetch.apt_update()
     fetch.apt_install(PACKAGES, fatal=False)
-    hookenv.status_set('maintenance','LLDP daemon installed')
+    hookenv.status_set('maintenance', 'LLDP daemon installed')
 
 
 @hooks.hook("config-changed")
 def config_changed():
-    hookenv.status_set('maintenance','Configuring LLDP daemon')
+    hookenv.status_set('maintenance', 'Configuring LLDP daemon')
     configs = hookenv.config()
     if 'i40e-lldp-stop' in configs:
         disable_i40e_lldp()
@@ -72,12 +71,13 @@ def disable_i40e_lldp():
     if not os.path.exists(path):
         return True
     for nic in os.listdir(path):
-        cmd = open('%s/%s/command' % (str(path),str(nic)), 'w')
+        cmd = open('%s/%s/command' % (str(path), str(nic)), 'w')
         cmd.write('lldp stop')
         cmd.close()
+
 
 if __name__ == '__main__':
     try:
         hooks.execute(sys.argv)
-    except hookenv.UnregisteredHookError as e:
+    except hookenv.UnregisteredHookError:
         pass
