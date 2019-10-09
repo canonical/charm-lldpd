@@ -33,3 +33,7 @@
     "type": "boolean"
     "default": False
     "description": "Enable the SNMP agent for LLDPD"
+  "short-name":
+    "type": "boolean"
+    "default": !!bool "False"
+    "description": "Set short name in SysName instead of FQDN"
