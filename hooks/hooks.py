@@ -58,9 +58,8 @@ def config_changed():
         args.append('-I %s ' % str(configs['interfaces-regex']))
     if configs['enable-snmp']:
         args.append('-x ')
-    if 'short-name' in configs:
-       if str(configs['short-name']) == "True":
-           short_name()
+    if configs['short-name']:
+        short_name()
     machine_id = os.environ['JUJU_MACHINE_ID']
     if machine_id:
         args.append('-S juju_machine_id=%s' % str(machine_id))
