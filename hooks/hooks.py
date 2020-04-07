@@ -79,12 +79,14 @@ def disable_i40e_lldp():
         cmd.write('lldp stop')
         cmd.close()
 
+
 def short_name():
     path = '/etc/lldpd.conf'
     shortname = os.uname()[1]
     cmd = open('%s' % (str(path)), 'w')
     cmd.write('configure system hostname %s\n' % str(shortname))
     cmd.close()
+
 
 if __name__ == '__main__':
     try:

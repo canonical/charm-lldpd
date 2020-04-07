@@ -9,7 +9,7 @@
        the NIC and do it within userspace."
   "interfaces-regex":
     "type": "string"
-    "default":
+    "default": ""
     "description": |
        "Which interfaces should lldpd announce details. If you want lldpd
        to listen on multiple interfaces, set it here. Examples:
@@ -27,7 +27,7 @@
        mode only."
   "systemid-from-interface":
     "type": "string"
-    "default":
+    "default": ""
     "description": "Pull systemID from this interface"
   "enable-snmp":
     "type": "boolean"
