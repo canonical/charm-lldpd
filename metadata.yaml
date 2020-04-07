@@ -18,6 +18,8 @@
 - "bionic"
 - "cosmic"
 - "disco"
+- "eoan"
+- "focal"
 "tags":
 - "network"
 - "ops"
