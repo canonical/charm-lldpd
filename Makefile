@@ -17,6 +17,15 @@ lint: virtualenv
 	.venv/bin/flake8 --exclude hooks/charmhelpers hooks tests/10-tests
 	@charm proof
 
+unittest: sysdeps lint
+	@echo "Running unit tests..."
+	@tox -e unit
+
+functional:
+	@echo "Running functional tests..."
+	@tox -e func
+
+
 bin/charm_helpers_sync.py:
 	@mkdir -p bin
 	@curl -o bin/charm_helpers_sync.py https://raw.githubusercontent.com/juju/charm-helpers/master/tools/charm_helpers_sync/charm_helpers_sync.py
