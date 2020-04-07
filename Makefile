@@ -4,6 +4,7 @@ export PYTHONPATH := hooks
 
 CHARM_STORE_URL := cs:~ivoks/lldpd
 REPO := https://github.com/CanonicalLtd/charm-lldpd
+CHARM_BUILD_DIR := $(if $(CHARM_BUILD_DIR),$(CHARM_BUILD_DIR),${CURDIR})
 
 SHELL := /bin/bash
 export SHELLOPTS:=errexit:pipefail
@@ -23,7 +24,7 @@ unittest: sysdeps lint
 
 functional:
 	@echo "Running functional tests..."
-	@tox -e func
+	@CHARM_BUILD_DIR="$(CHARM_BUILD_DIR)" tox -e func
 
 
 bin/charm_helpers_sync.py:
