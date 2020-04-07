@@ -3,7 +3,7 @@ PYTHON := /usr/bin/python3
 export PYTHONPATH := hooks
 
 CHARM_STORE_URL := cs:~ivoks/lldpd
-REPO := git+ssh://git.launchpad.net/lldpd-charm
+REPO := https://github.com/CanonicalLtd/charm-lldpd
 
 SHELL := /bin/bash
 export SHELLOPTS:=errexit:pipefail
