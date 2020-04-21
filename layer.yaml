@@ -1,0 +1,14 @@
+# exclude the interfaces and layers folders we use for submodules
+exclude:
+  - interfaces
+  - layers
+# include required layers here
+includes:
+  - 'layer:basic'
+  - 'layer:apt'
+  - 'interface:nrpe-external-master'
+options:
+  apt:
+    packages:
+      - 'lldpd'
+repo: "https://github.com/CanonicalLtd/charm-lldpd.git"

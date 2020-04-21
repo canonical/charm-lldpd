@@ -1,4 +1,0 @@
-charmhelpers
-mock
-pytest
-pytest-cov
