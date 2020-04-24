@@ -21,7 +21,7 @@ lint:
 
 test: lint unittest functional
 
-unittest:
+unittest: submodules
 	@tox -e unit
 
 functional:
