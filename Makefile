@@ -35,6 +35,7 @@ release: clean
 
 clean:
 	@echo "Cleaning files"
+	@if [ -d  htmlcov ] ; then rm -r htmlcov ; fi
 	@if [ -d .tox ] ; then rm -r .tox ; fi
 	@if [ -d .pytest_cache ] ; then rm -r .pytest_cache ; fi
 	@find . -iname __pycache__ -exec rm -r {} +
