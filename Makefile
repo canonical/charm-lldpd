@@ -1,57 +1,43 @@
-#!/usr/bin/make
-PYTHON := /usr/bin/python3
-export PYTHONPATH := hooks
+help:
+	@echo "This project supports the following targets"
+	@echo ""
+	@echo " make help - show this text"
+	@echo " make submodules - make sure that the submodules are up-to-date"
+	@echo " make lint - run flake8"
+	@echo " make test - run the unittests and lint"
+	@echo " make unittest - run the tests defined in the unittest subdirectory"
+	@echo " make functional - run the tests defined in the functional subdirectory"
+	@echo " make release - build the charm"
+	@echo " make clean - remove unneeded files"
+	@echo ""
 
-CHARM_STORE_URL := cs:~ivoks/lldpd
-REPO := https://github.com/CanonicalLtd/charm-lldpd
-CHARM_BUILD_DIR := $(if $(CHARM_BUILD_DIR),$(CHARM_BUILD_DIR),${CURDIR})
+submodules:
+	@echo "Cloning submodules"
+	@git submodule update --init --recursive
 
-SHELL := /bin/bash
-export SHELLOPTS:=errexit:pipefail
+lint:
+	@echo "Running flake8"
+	@tox -e lint
 
+test: lint unittest functional
 
-virtualenv:
-	virtualenv -p $(PYTHON) .venv
-	.venv/bin/pip install flake8 nose mock six
-
-lint: virtualenv
-	.venv/bin/flake8 --exclude hooks/charmhelpers hooks tests/10-tests
-	@charm proof
-
-unittest: sysdeps lint
-	@echo "Running unit tests..."
+unittest: submodules
 	@tox -e unit
 
 functional:
-	@echo "Running functional tests..."
-	@CHARM_BUILD_DIR="$(CHARM_BUILD_DIR)" tox -e func
+	@PYTEST_KEEP_MODEL=$(PYTEST_KEEP_MODEL) \
+	    PYTEST_CLOUD_NAME=$(PYTEST_CLOUD_NAME) \
+	    PYTEST_CLOUD_REGION=$(PYTEST_CLOUD_REGION) \
+	    tox -e functional
 
+release: clean
+	@-git describe --tags > ./repo-info
 
-bin/charm_helpers_sync.py:
-	@mkdir -p bin
-	@curl -o bin/charm_helpers_sync.py https://raw.githubusercontent.com/juju/charm-helpers/master/tools/charm_helpers_sync/charm_helpers_sync.py
+clean:
+	@echo "Cleaning files"
+	@if [ -d .tox ] ; then rm -r .tox ; fi
+	@if [ -d .pytest_cache ] ; then rm -r .pytest_cache ; fi
+	@find . -iname __pycache__ -exec rm -r {} +
 
-sync: bin/charm_helpers_sync.py
-	@$(PYTHON) bin/charm_helpers_sync.py -c charm-helpers-hooks.yaml
-
-test:
-	@echo Starting Amulet tests...
-	# coreycb note: The -v should only be temporary until Amulet sends
-	# raise_status() messages to stderr:
-	#   https://bugs.launchpad.net/amulet/+bug/1320357
-	@juju test -v -p AMULET_HTTP_PROXY --timeout 900 \
-	00-setup 10-tests
-
-publish-stable:
-	@if [ -n "`git status --porcelain`" ]; then \
-	    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'; \
-	    echo '!!! There are uncommitted changes !!!'; \
-	    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'; \
-	    false; \
-	fi
-	git clean -fdx
-	export rev=`charm push . $(CHARM_STORE_URL) 2>&1 \
-		| tee /dev/tty | grep url: | cut -f 2 -d ' '` \
-	&& git tag -f -m "$$rev" `echo $$rev | tr -s '~:/' -` \
-	&& git push --tags $(REPO) \
-	&& charm publish -c stable $$rev
+# The targets below don't depend on a file
+.PHONY: lint test unittest functional release clean help submodules
