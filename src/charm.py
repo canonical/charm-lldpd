@@ -21,7 +21,7 @@ import logging
 import os
 import sys
 
-sys.path.append("lib")  # noqa: E402
+sys.path.insert(0, "lib/")  # noqa: E402
 
 from charmhelpers import fetch
 from charmhelpers.contrib.charmsupport import nrpe
