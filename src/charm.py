@@ -23,13 +23,13 @@ import sys
 
 sys.path.insert(0, "lib/")  # noqa: E402
 
-from charmhelpers import fetch
-from charmhelpers.contrib.charmsupport import nrpe
-from charmhelpers.core import host
-from ops.charm import CharmBase
-from ops.framework import StoredState
-from ops.main import main
-from ops.model import ActiveStatus, MaintenanceStatus
+from charmhelpers import fetch  # noqa: E402
+from charmhelpers.contrib.charmsupport import nrpe  # noqa: E402
+from charmhelpers.core import host  # noqa: E402
+from ops.charm import CharmBase  # noqa: E402
+from ops.framework import StoredState  # noqa: E402
+from ops.main import main  # noqa: E402
+from ops.model import ActiveStatus, MaintenanceStatus  # noqa: E402
 
 PACKAGES = ["lldpd"]
 PATHS = {
