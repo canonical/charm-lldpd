@@ -16,10 +16,9 @@
 - "trusty"
 - "xenial"
 - "bionic"
-- "cosmic"
-- "disco"
-- "eoan"
 - "focal"
+- "groovy"
+- "hirsute"
 "tags":
 - "network"
 - "ops"
