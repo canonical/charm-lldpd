@@ -23,13 +23,13 @@ import sys
 
 sys.path.insert(0, "lib/")  # noqa: E402
 
-from charmhelpers import fetch  # noqa: E402
-from charmhelpers.contrib.charmsupport import nrpe  # noqa: E402
-from charmhelpers.core import host  # noqa: E402
+
 from ops.charm import CharmBase  # noqa: E402
 from ops.framework import StoredState  # noqa: E402
 from ops.main import main  # noqa: E402
 from ops.model import ActiveStatus, MaintenanceStatus  # noqa: E402
+from charms.operator_libs_linux.v0 import apt
+from charms.operator_libs_linux.v0.systemd import service_running, service_reload
 
 PACKAGES = ["lldpd"]
 PATHS = {
@@ -47,10 +47,12 @@ class LldpdCharm(CharmBase):
     def __init__(self, *args):
         super().__init__(*args)
         self.framework.observe(self.on.install, self.on_upgrade_charm)
-        self.framework.observe(self.on.upgrade_charm, self)
-        self.framework.observe(self.on.config_changed, self)
-        self.framework.observe(self.on.nrpe_external_master_relation_changed,
-                               self)
+        self.framework.observe(self.on.upgrade_charm, self.on_upgrade_charm)
+        self.framework.observe(self.on.config_changed, self.on_config_changed)
+        self.framework.observe(
+            self.on.nrpe_external_master_relation_changed,
+            self.on_nrpe_external_master_relation_changed,
+        )
         self.framework.observe(
             self.on.nrpe_external_master_relation_joined,
             self.on_nrpe_external_master_relation_changed,
@@ -77,8 +79,9 @@ class LldpdCharm(CharmBase):
         # TODO get this working for config-changed, but only if relation exists
 
     def install(self):
-        fetch.apt_update()
-        fetch.apt_install(PACKAGES, fatal=False)
+        apt.update()
+        apt.add_package(PACKAGES)
+        noop = True
 
     def configure(self):
         """Base config-changed hook."""
@@ -102,7 +105,7 @@ class LldpdCharm(CharmBase):
         args.append('"\n')
         conf.write("".join(args))
         conf.close()
-        host.service_restart("lldpd")
+        service_reload("lldpd", restart_on_failure=True)
         self.framework.model.unit.status = ActiveStatus("ready")
 
     def disable_i40e_lldp(self):
@@ -123,12 +126,8 @@ class LldpdCharm(CharmBase):
         cmd.close()
 
     def setup_nrpe(self):
-        hostname = nrpe.get_nagios_hostname()
-        current_unit = nrpe.get_nagios_unit_name()
-        nrpe_setup = nrpe.NRPE(hostname=hostname)
-        nrpe.add_init_service_checks(nrpe_setup, ["lldpd"], current_unit)
-        nrpe_setup.write()
-
+        ## FIXME use ops-lib-nrpe
+        nop = 0
 
 if __name__ == "__main__":
     main(LldpdCharm)

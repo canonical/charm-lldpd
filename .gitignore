@@ -21,3 +21,6 @@ repo-info
 
 # reports
 report/*
+
+# charm files
+*.charm
