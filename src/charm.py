@@ -20,6 +20,7 @@
 import logging
 import os
 import sys
+import subprocess
 
 sys.path.insert(0, "lib/")  # noqa: E402
 
@@ -114,9 +115,17 @@ class LldpdCharm(CharmBase):
         if not os.path.exists(path):
             return True
         for nic in os.listdir(path):
-            cmd = open("{}/{}/command".format(str(path), str(nic)), "w")
-            cmd.write("lldp stop")
-            cmd.close()
+            try:
+                cmd = ["ethtool",
+                       "--set-priv-flags",
+                       nic,
+                       "disable-fw-lldp",
+                       "on"]
+                subprocess.run(cmd, check=True)
+            except subprocess.CalledProcessError as e:
+                logger.error("Error when disabling LLDP on %s: %s", nic, e)
+                return False
+        return True
 
     def short_name(self):
         """Add system shortname to lldpd."""
