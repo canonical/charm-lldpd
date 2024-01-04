@@ -20,6 +20,7 @@
 import logging
 import os
 import sys
+import subprocess
 
 sys.path.insert(0, "lib/")  # noqa: E402
 
@@ -110,14 +111,17 @@ class LldpdCharm(CharmBase):
 
     def disable_i40e_lldp(self):
         """Disable i40e."""
-        path = "/sys/kernel/debug/i40e"
-        if not os.path.exists(path):
-            return True
-        for nic in os.listdir(path):
-            cmd = open("{}/{}/command".format(str(path), str(nic)), "w")
-            cmd.write("lldp stop")
-            cmd.close()
+        getnics = "grep i40e /var/log/kern.log | grep renamed | awk '{ print substr($10, 1, length($10)-1) }' | sort -u"
+        nics = subprocess.check_output(getnics, shell=True)
 
+        if nics == "":
+            logger.info("Can't find any i40e NICs in kern.log")
+            exit(0)
+
+        for nic in nics.decode('UTF-8').splitlines():
+            logger.info("Using ethtool(8) to disable FW lldp for %s" % nic)
+            subprocess.run(['sudo', '/usr/sbin/ethtool', '--set-priv-flags', nic, 'disable-fw-lldp', 'on'])
+            
     def short_name(self):
         """Add system shortname to lldpd."""
         shortname = os.uname()[1]
