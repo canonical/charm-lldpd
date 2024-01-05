@@ -111,7 +111,7 @@ class LldpdCharm(CharmBase):
 
     def disable_i40e_lldp(self):
         """Disable i40e."""
-        getnics = "grep i40e /var/log/kern.log | grep renamed | awk '{ print substr($10, 1, length($10)-1) }' | sort -u"
+        getnics = "stat --format '%N' /sys/class/net/*/device/driver | grep 'drivers/i40e' | cut -d/ -f 5"
         nics = subprocess.check_output(getnics, shell=True)
 
         if nics == "":
