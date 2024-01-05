@@ -115,7 +115,7 @@ class LldpdCharm(CharmBase):
         nics = subprocess.check_output(getnics, shell=True)
 
         if nics == "":
-            logger.info("Can't find any i40e NICs in kern.log")
+            logger.info("Can't find any i40e NICs")
             exit(0)
 
         for nic in nics.decode('UTF-8').splitlines():
