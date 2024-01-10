@@ -31,6 +31,7 @@ from ops.main import main  # noqa: E402
 from ops.model import ActiveStatus, MaintenanceStatus  # noqa: E402
 from charms.operator_libs_linux.v0 import apt
 from charms.operator_libs_linux.v0.systemd import service_running, service_reload
+from pathlib import Path
 
 PACKAGES = ["lldpd"]
 PATHS = {
