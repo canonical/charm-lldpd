@@ -25,10 +25,8 @@ class TestCharm(unittest.TestCase):
     ):
         mock_path("/sys/class/net").iterdir.return_value = []
 
-        with self.assertRaises(SystemExit) as cm:
-            self.harness.charm.disable_i40e_lldp()
+        self.harness.charm.disable_i40e_lldp()
 
-        self.assertEqual(cm.exception.code, 0)
         mock_logger.info.assert_called_with(
             "Can't find any i40e NICs. Recommend setting the charm config i40e-lldp-stop to false"
         )

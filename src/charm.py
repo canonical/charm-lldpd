@@ -126,7 +126,7 @@ class LldpdCharm(CharmBase):
             logger.info(
                 "Can't find any i40e NICs. Recommend setting the charm config i40e-lldp-stop to false"
             )
-            exit(0)
+            return
 
         for nic in nics:
             logger.info("Using ethtool(8) to disable FW lldp for %s" % nic)
