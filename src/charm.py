@@ -19,24 +19,20 @@
 
 import logging
 import os
-import sys
 import subprocess
 
-sys.path.insert(0, "lib/")  # noqa: E402
-
-
-from ops.charm import CharmBase  # noqa: E402
-from ops.framework import StoredState  # noqa: E402
-from ops.main import main  # noqa: E402
-from ops.model import ActiveStatus, MaintenanceStatus  # noqa: E402
+from ops.charm import CharmBase
+from ops.framework import StoredState
+from ops.main import main
+from ops.model import ActiveStatus, MaintenanceStatus
 from charms.operator_libs_linux.v0 import apt
-from charms.operator_libs_linux.v0.systemd import service_running, service_reload
+from charms.operator_libs_linux.v0.systemd import service_reload
 from pathlib import Path
 
 PACKAGES = ["lldpd"]
 PATHS = {
-    'lldpddef': "/etc/default/lldpd",
-    'lldpdconf': "/etc/lldpd.conf",
+    "lldpddef": "/etc/default/lldpd",
+    "lldpdconf": "/etc/lldpd.conf",
 }
 logger = logging.getLogger(__name__)
 
@@ -83,7 +79,6 @@ class LldpdCharm(CharmBase):
     def install(self):
         apt.update()
         apt.add_package(PACKAGES)
-        noop = True
 
     def configure(self):
         """Base config-changed hook."""
@@ -93,8 +88,7 @@ class LldpdCharm(CharmBase):
         conf = open(PATHS["lldpddef"], "w")
         args = ['DAEMON_ARGS="']
         if configs.get("systemid-from-interface"):
-            args.append("-C {} ".format(
-                str(configs["systemid-from-interface"])))
+            args.append("-C {} ".format(str(configs["systemid-from-interface"])))
         if configs.get("interfaces-regex"):
             args.append("-I {} ".format(str(configs["interfaces-regex"])))
         if configs.get("enable-snmp"):
@@ -113,6 +107,7 @@ class LldpdCharm(CharmBase):
     def disable_i40e_lldp(self):
         """Disable i40e."""
         I40E_DRIVER_NAME = "i40e"
+
         def i40e_filter(path: Path) -> bool:
             """Filter for devices using i40e driver."""
             if not path or not path.exists():
@@ -121,17 +116,32 @@ class LldpdCharm(CharmBase):
             if not driver.exists() or not driver.is_symlink():
                 return False
             return I40E_DRIVER_NAME == driver.resolve(strict=True).name
- 
-        nics = [device.name for device in filter(i40e_filter, Path("/sys/class/net").iterdir())]
- 
+
+        nics = [
+            device.name
+            for device in filter(i40e_filter, Path("/sys/class/net").iterdir())
+        ]
+
         if not nics:
-            logger.info("Can't find any i40e NICs. Recommend setting the charm config i40e-lldp-stop to false")
+            logger.info(
+                "Can't find any i40e NICs. Recommend setting the charm config i40e-lldp-stop to false"
+            )
             exit(0)
- 
+
         for nic in nics:
             logger.info("Using ethtool(8) to disable FW lldp for %s" % nic)
-            subprocess.run(['sudo', '/usr/sbin/ethtool', '--set-priv-flags', nic, 'disable-fw-lldp', 'on'], check=True)
-            
+            subprocess.run(
+                [
+                    "sudo",
+                    "/usr/sbin/ethtool",
+                    "--set-priv-flags",
+                    nic,
+                    "disable-fw-lldp",
+                    "on",
+                ],
+                check=True,
+            )
+
     def short_name(self):
         """Add system shortname to lldpd."""
         shortname = os.uname()[1]
@@ -141,7 +151,8 @@ class LldpdCharm(CharmBase):
 
     def setup_nrpe(self):
         ## FIXME use ops-lib-nrpe
-        nop = 0
+        pass
+
 
 if __name__ == "__main__":
     main(LldpdCharm)
