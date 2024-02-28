@@ -20,6 +20,7 @@
 import logging
 import os
 import sys
+import subprocess
 
 sys.path.insert(0, "lib/")  # noqa: E402
 
@@ -30,6 +31,7 @@ from ops.main import main  # noqa: E402
 from ops.model import ActiveStatus, MaintenanceStatus  # noqa: E402
 from charms.operator_libs_linux.v0 import apt
 from charms.operator_libs_linux.v0.systemd import service_running, service_reload
+from pathlib import Path
 
 PACKAGES = ["lldpd"]
 PATHS = {
@@ -110,14 +112,26 @@ class LldpdCharm(CharmBase):
 
     def disable_i40e_lldp(self):
         """Disable i40e."""
-        path = "/sys/kernel/debug/i40e"
-        if not os.path.exists(path):
-            return True
-        for nic in os.listdir(path):
-            cmd = open("{}/{}/command".format(str(path), str(nic)), "w")
-            cmd.write("lldp stop")
-            cmd.close()
-
+        I40E_DRIVER_NAME = "i40e"
+        def i40e_filter(path: Path) -> bool:
+            """Filter for devices using i40e driver."""
+            if not path or not path.exists():
+                return False
+            driver = path / "device/driver"
+            if not driver.exists() or not driver.is_symlink():
+                return False
+            return I40E_DRIVER_NAME == driver.resolve(strict=True).name
+ 
+        nics = [device.name for device in filter(i40e_filter, Path("/sys/class/net").iterdir())]
+ 
+        if not nics:
+            logger.info("Can't find any i40e NICs. Recommend setting the charm config i40e-lldp-stop to false")
+            exit(0)
+ 
+        for nic in nics:
+            logger.info("Using ethtool(8) to disable FW lldp for %s" % nic)
+            subprocess.run(['sudo', '/usr/sbin/ethtool', '--set-priv-flags', nic, 'disable-fw-lldp', 'on'], check=True)
+            
     def short_name(self):
         """Add system shortname to lldpd."""
         shortname = os.uname()[1]
