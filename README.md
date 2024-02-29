@@ -6,15 +6,15 @@ switches and routers.
 
 # Usage
 
-Start by installing the lldpd charm and relating it to another application:
+Start by installing the lldpd charm and relating it to another application, e.g.
 
+juju deploy ubuntu
 juju deploy lldpd
 
-juju add-relation lldpd application-on-physical-machine
+juju integrate lldpd ubuntu
 
 Being a subordinate charm it needs to be related to an application running
-on physical machine. It doesn't make much sense to install LLDP on a VM
-or LXD container, because Linux bridge will terminate LLDP traffic.
+on physical machine, in the above case the Ubuntu charm.
 
 ## Scale out Usage
 
@@ -22,12 +22,12 @@ By scaling your application, subordinate charm will get installed automatically.
 
 ## Known Limitations and Issues
 
-LLDP is not very useful on containers and virtual machines and therefore it's
-use on those is not recommended.
+Deploying LLDP to an LXD container or virtual machine may not work as expected
+due to network bridges for virtual infrastructure not passing through LLDP frames.
 
 # Configuration
 
-By default LLDPd will listen on all interfaces and pick, more or less, a random
+By default, LLDPd will listen on all interfaces and pick, more or less, a random
 systemid. Two given configuration options allow user to specify which interfaces
 will be used to broadcast LLDP data and which will be used for systemid.
 
