@@ -1,42 +1,45 @@
-"options":
-  "i40e-lldp-stop":
-    "type": "boolean"
-    "default": !!bool "True"
-    "description": |
-       "This allows control over Intel's i40e NIC driver. By default
-       i40e blocks userspace LLDP and does it on its own. Setting this
-       option to 'True' means charm will disable this functionality in
-       the NIC and do it within userspace."
-  "interfaces-regex":
-    "type": "string"
-    "default": ""
-    "description": |
-       "Which interfaces should lldpd announce details. If you want lldpd
-       to listen on multiple interfaces, set it here. Examples:
+options:
+  i40e-lldp-stop:
+    type: boolean
+    default: True
+    description: |
+      This allows control over Intel's i40e NIC driver. By default
+      i40e blocks userspace LLDP and does it on its own. Setting this
+      option to 'True' means charm will disable this functionality in
+      the NIC and do it within userspace.
+  interfaces-regex:
+    type: string
+    default: ""
+    description: |
+      Which interfaces should lldpd announce details. If you want lldpd
+      to listen on multiple interfaces, set it here. Examples:
 
-       seth*,meth*
+      seth*,meth*
 
-       You can also use exclamation mark to exclude an interface:
+      You can also use exclamation mark to exclude an interface:
 
-       eth*,!eth1
+      eth*,!eth1
 
-       This way lldpd will listen on all eth* interfaces with an
-       exception of eth1.
+      This way lldpd will listen on all eth* interfaces with an
+      exception of eth1.
 
-       By default this is set to None, which puts lldpd in listening
-       mode only."
-  "systemid-from-interface":
-    "type": "string"
-    "default": ""
-    "description": "Pull systemID from this interface"
-  "enable-snmp":
-    "type": "boolean"
-    "default": False
-    "description": "Enable the SNMP agent for LLDPD"
-  "short-name":
-    "type": "boolean"
-    "default": !!bool "False"
-    "description": "Set short name in SysName instead of FQDN"
+      By default this is set to None, which puts lldpd in listening
+      mode only.
+  systemid-from-interface:
+    type: string
+    default: ""
+    description: |
+      Pull systemID from this interface
+  enable-snmp:
+    type: boolean
+    default: False
+    description: |
+      Enable the SNMP agent for LLDPD
+  short-name:
+    type: boolean
+    default: False
+    description: |
+      Set short name in SysName instead of FQDN
   nagios_context:
     default: "juju"
     type: string
@@ -50,4 +53,4 @@
     default: "juju"
     type: string
     description: |
-      Comma separated list of nagios servicegroups for the check
+      Comma separated list of nagios service groups for the check
