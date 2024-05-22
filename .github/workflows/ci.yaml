@@ -63,3 +63,26 @@ jobs:
       - name: Run tests
         run: tox -e unit
 
+  integration-test:
+    strategy:
+      fail-fast: true
+      matrix:
+        bases:
+          - ubuntu@20.04
+          - ubuntu@22.04
+      name: Integration tests (LXD) | ${{ matrix.bases }}
+      runs-on: ubuntu-latest
+      needs:
+        - inclusive-naming-check
+        - lint
+        - unit-test
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Setup operator environment
+          uses: charmed-kubernetes/actions-operator@main
+          with:
+            provider: lxd
+            juju-channel: 3/stable
+        - name: Run tests
+          run: tox run -e integration -- --charm-base=${{ matrix.bases }}

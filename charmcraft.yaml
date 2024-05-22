@@ -1,34 +1,60 @@
-# Learn more about charmcraft.yaml configuration at:
-# https://juju.is/docs/sdk/charmcraft-config
 type: "charm"
+name: lldpd
+title: LLDPd Operator
+summary: An operator that provides lldpd.
+description: |
+  An operator charm that provides the link-layer discover protocol (LLDP) services.
+  This operator installs and manages the lldpd package and services.
+
+  LLDP is a layer 2 neighbor discovery protocol that allows devices to advertise their
+  device information to their neighbors.
+
+  LLDP is generally disabled by default on linux bridges and may not allow for transmission
+  of LLDP packets by default. As such, the use of this LLDP in an environment configured
+  with linux bridging may need additional tweaks at the host level.
+
+requires:
+  juju-info:
+    interface: juju-info
+    scope: container
+  master:
+    interface: lldp
+provides:
+  nrpe-external-master:
+    interface: nrpe-external-master
+    scope: container
+subordinate: true
+
 bases:
   - build-on:
-    - name: "ubuntu"
-      channel: "22.04"
+      - name: "ubuntu"
+        channel: "22.04"
+        architectures: [amd64]
     run-on:
-    - name: "ubuntu"
-      channel: "22.04"
+      - name: "ubuntu"
+        channel: "22.04"
+        architectures: [amd64]
   - build-on:
-    - name: "ubuntu"
-      channel: "22.04"
+      - name: "ubuntu"
+        channel: "22.04"
+        architectures: [arm64]
     run-on:
-    - name: "ubuntu"
-      channel: "22.10"
+      - name: "ubuntu"
+        channel: "22.04"
+        architectures: [arm64]
   - build-on:
-    - name: "ubuntu"
-      channel: "22.04"
+      - name: "ubuntu"
+        channel: "20.04"
+        architectures: [amd64]
     run-on:
-    - name: "ubuntu"
-      channel: "23.04"
+      - name: "ubuntu"
+        channel: "20.04"
+        architectures: [amd64]
   - build-on:
-    - name: "ubuntu"
-      channel: "20.04"
+      - name: "ubuntu"
+        channel: "20.04"
+        architectures: [arm64]
     run-on:
-    - name: "ubuntu"
-      channel: "20.04"
-  - build-on:
-    - name: "ubuntu"
-      channel: "20.04"
-    run-on:
-    - name: "ubuntu"
-      channel: "18.04"
+      - name: "ubuntu"
+        channel: "20.04"
+        architectures: [arm64]

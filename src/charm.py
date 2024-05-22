@@ -80,27 +80,32 @@ class LldpdCharm(CharmBase):
         apt.update()
         apt.add_package(PACKAGES)
 
+    @property
+    def machine_id(self):
+        return os.environ.get("JUJU_MACHINE_ID", None)
+
     def configure(self):
         """Base config-changed hook."""
-        configs = self.model.config
-        if "i40e-lldp-stop" in configs:
+        config = self.model.config
+
+        # handle the side effects first
+        if config["i40e-lldp-stop"]:
             self.disable_i40e_lldp()
-        conf = open(PATHS["lldpddef"], "w")
-        args = ['DAEMON_ARGS="']
-        if configs.get("systemid-from-interface"):
-            args.append("-C {} ".format(str(configs["systemid-from-interface"])))
-        if configs.get("interfaces-regex"):
-            args.append("-I {} ".format(str(configs["interfaces-regex"])))
-        if configs.get("enable-snmp"):
-            args.append("-x ")
-        if configs.get("short-name"):
-            self.short_name()
-        machine_id = os.environ["JUJU_MACHINE_ID"]
-        if machine_id:
-            args.append("-S juju_machine_id={}".format(str(machine_id)))
-        args.append('"\n')
-        conf.write("".join(args))
-        conf.close()
+        if config["short-name"]:
+            self.update_short_name()
+
+        args = []
+        if config["systemid-from-interface"]:
+            args.append("-C {}".format(config["systemid-from-interface"]))
+        if config["interfaces-regex"]:
+            args.append("-I {}".format(config["interfaces-regex"]))
+        if config["enable-snmp"]:
+            args.append("-x")
+        if self.machine_id:
+            args.append("-S juju_machine_id={}".format(self.machine_id))
+
+        with open(PATHS["lldpddef"], "w") as conf:
+            conf.write('DAEMON_ARGS="{}"\n'.format(" ".join(args)))
         service_reload("lldpd", restart_on_failure=True)
         self.framework.model.unit.status = ActiveStatus("ready")
 
@@ -142,12 +147,11 @@ class LldpdCharm(CharmBase):
                 check=True,
             )
 
-    def short_name(self):
+    def update_short_name(self):
         """Add system shortname to lldpd."""
         shortname = os.uname()[1]
-        cmd = open(PATHS["lldpdconf"], "w")
-        cmd.write("configure system hostname {}\n".format(str(shortname)))
-        cmd.close()
+        with open(PATHS["lldpdconf"], "w") as f:
+            f.write("configure system hostname {}\n".format(str(shortname)))
 
     def setup_nrpe(self):
         ## FIXME use ops-lib-nrpe
