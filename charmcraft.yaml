@@ -19,10 +19,6 @@ requires:
     scope: container
   master:
     interface: lldp
-provides:
-  nrpe-external-master:
-    interface: nrpe-external-master
-    scope: container
 subordinate: true
 
 bases:
