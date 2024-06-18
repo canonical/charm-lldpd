@@ -68,8 +68,9 @@ jobs:
       fail-fast: true
       matrix:
         bases:
-          - ubuntu@20.04
-          - ubuntu@22.04
+          - bionic
+          - focal
+          - jammy
     name: Integration tests (LXD) | ${{ matrix.bases }}
     runs-on: ubuntu-latest
     needs:
@@ -83,6 +84,6 @@ jobs:
         uses: charmed-kubernetes/actions-operator@main
         with:
           provider: lxd
-          juju-channel: 3/stable
+          juju-channel: 2.9/stable
       - name: Run tests
         run: tox run -e integration -- --charm-base=${{ matrix.bases }}
