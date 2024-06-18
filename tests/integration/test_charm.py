@@ -55,8 +55,8 @@ async def test_build_and_deploy(
         ),
     )
 
-    # Integrate lldpd with ubuntu
-    await ops_test.model.integrate("ubuntu:juju-info", "lldpd:juju-info")
+    # Relate lldpd with ubuntu
+    await ops_test.model.relate("ubuntu:juju-info", "lldpd:juju-info")
     async with ops_test.fast_forward():
         await ops_test.model.wait_for_idle(
             apps=["lldpd", "ubuntu"], status="active", timeout=1800
