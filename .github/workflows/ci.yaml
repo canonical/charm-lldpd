@@ -82,7 +82,7 @@ jobs:
       fail-fast: true
       matrix:
         bases:
-          - bionic`
+          - bionic
     name: Integration tests (LXD) | ${{ matrix.bases }}
     runs-on: ubuntu-latest
     needs:
