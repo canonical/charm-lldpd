@@ -1,5 +1,4 @@
 type: "charm"
-name: lldpd
 title: LLDPd Operator
 
 bases:
