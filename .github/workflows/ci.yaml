@@ -16,6 +16,8 @@ name: lldpd charm tests
 on:
   workflow_call:
   pull_request:
+  # FIXME: remove before merging
+  push:
 
 jobs:
   inclusive-naming-check:
@@ -36,6 +38,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run linters
@@ -47,6 +53,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run static analysis
@@ -58,6 +68,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run tests
@@ -78,6 +92,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
       - name: Setup operator environment
         uses: charmed-kubernetes/actions-operator@main
         with:
