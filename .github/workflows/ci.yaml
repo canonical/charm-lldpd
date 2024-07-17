@@ -16,6 +16,8 @@ name: lldpd charm tests
 on:
   workflow_call:
   pull_request:
+  # FIXME: remove before merging
+  push:
 
 jobs:
   inclusive-naming-check:
@@ -32,10 +34,14 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run linters
@@ -43,10 +49,14 @@ jobs:
 
   static-analysis:
     name: Static Analysis
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run static analysis
@@ -54,10 +64,14 @@ jobs:
 
   unit-test:
     name: Unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run tests
@@ -68,7 +82,7 @@ jobs:
       fail-fast: true
       matrix:
         bases:
-          - bionic`
+          - bionic
     name: Integration tests (LXD) | ${{ matrix.bases }}
     runs-on: ubuntu-latest
     needs:
@@ -78,6 +92,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
       - name: Setup operator environment
         uses: charmed-kubernetes/actions-operator@main
         with:

@@ -1,2 +1,2 @@
-ops >= 1.4.0, <= 1.5.5
+ops < 2
 websocket_client <= 1.6.4
