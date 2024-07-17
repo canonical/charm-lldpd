@@ -1,17 +1,4 @@
 ---
-name: lldpd
-summary: An operator that provides lldpd.
-description: |
-  An operator charm that provides the link-layer discovery protocol (LLDP) services.
-  This operator installs and manages the lldpd package and services.
-
-  LLDP is a layer 2 neighbor discovery protocol that allows devices to advertise their
-  device information to their neighbors.
-
-  LLDP is generally disabled by default on Linux bridges which block the transmission
-  of LLDP packets by default. As such, the use of this LLDP in an environment configured
-  with Linux bridging may need additional tweaks at the host level.
-
 requires:
   juju-info:
     interface: juju-info
