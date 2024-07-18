@@ -45,7 +45,7 @@ async def test_build_and_deploy(
             "ubuntu",
             application_name="ubuntu",
             num_units=NUM_UNITS,
-            base=charm_base,
+            series="bionic",
         ),
         ops_test.model.deploy(
             str(lldpd),
