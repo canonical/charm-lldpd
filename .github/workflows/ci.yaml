@@ -16,8 +16,6 @@ name: lldpd charm tests
 on:
   workflow_call:
   pull_request:
-  # FIXME: remove before merging
-  push:
 
 jobs:
   inclusive-naming-check:
