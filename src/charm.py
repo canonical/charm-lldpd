@@ -20,9 +20,10 @@
 import logging
 import os
 import subprocess
+from typing import cast
 
-from ops.charm import CharmBase
-from ops.framework import StoredState
+from ops.charm import CharmBase, RelationChangedEvent, RelationJoinedEvent
+from ops.framework import EventSource, ObjectEvents, StoredState
 from ops.main import main
 from ops.model import ActiveStatus, MaintenanceStatus
 from charms.operator_libs_linux.v0 import apt
@@ -37,6 +38,13 @@ PATHS = {
 logger = logging.getLogger(__name__)
 
 
+class LldpCharmEvents(ObjectEvents):
+    """Declare relation-specific events for the type checker."""
+
+    nrpe_external_master_relation_changed = EventSource(RelationChangedEvent)
+    nrpe_external_master_relation_joined = EventSource(RelationJoinedEvent)
+
+
 class LldpdCharm(CharmBase):
     """Charm to deploy and manage lldpd"""
 
@@ -48,11 +56,11 @@ class LldpdCharm(CharmBase):
         self.framework.observe(self.on.upgrade_charm, self.on_upgrade_charm)
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(
-            self.on.nrpe_external_master_relation_changed,
+            cast(LldpCharmEvents, self.on).nrpe_external_master_relation_changed,
             self.on_nrpe_external_master_relation_changed,
         )
         self.framework.observe(
-            self.on.nrpe_external_master_relation_joined,
+            cast(LldpCharmEvents, self.on).nrpe_external_master_relation_joined,
             self.on_nrpe_external_master_relation_changed,
         )
 

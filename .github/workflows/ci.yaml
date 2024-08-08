@@ -32,10 +32,14 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run linters
@@ -43,10 +47,14 @@ jobs:
 
   static-analysis:
     name: Static Analysis
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run static analysis
@@ -54,10 +62,14 @@ jobs:
 
   unit-test:
     name: Unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.6
       - name: Install dependencies
         run: python3 -m pip install tox
       - name: Run tests
@@ -68,8 +80,7 @@ jobs:
       fail-fast: true
       matrix:
         bases:
-          - ubuntu@20.04
-          - ubuntu@22.04
+          - ubuntu@18.04
     name: Integration tests (LXD) | ${{ matrix.bases }}
     runs-on: ubuntu-latest
     needs:
@@ -79,10 +90,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
       - name: Setup operator environment
         uses: charmed-kubernetes/actions-operator@main
         with:
           provider: lxd
-          juju-channel: 3/stable
+          juju-channel: 2.9/stable
       - name: Run tests
         run: tox run -e integration -- --charm-base=${{ matrix.bases }}
