@@ -138,7 +138,7 @@ class LldpdCharm(CharmBase):
             subprocess.run(
                 [
                     "sudo",
-                    "/usr/sbin/ethtool",
+                    "ethtool",
                     "--set-priv-flags",
                     nic,
                     "disable-fw-lldp",
