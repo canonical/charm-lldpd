@@ -20,6 +20,7 @@
 import logging
 import os
 import subprocess
+import shutil
 from typing import cast
 
 from ops.charm import CharmBase, RelationChangedEvent, RelationJoinedEvent
@@ -141,12 +142,17 @@ class LldpdCharm(CharmBase):
             )
             return
 
+        ethtool_cmd = shutil.which("ethtool")
+        if ethtool_cmd is None:
+            logger.info("ethtool not found in PATH")
+            return
+
         for nic in nics:
             logger.info("Using ethtool(8) to disable FW lldp for %s" % nic)
             subprocess.run(
                 [
                     "sudo",
-                    "/usr/sbin/ethtool",
+                    ethtool_cmd,
                     "--set-priv-flags",
                     nic,
                     "disable-fw-lldp",
