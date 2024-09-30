@@ -34,11 +34,13 @@ class TestCharm(unittest.TestCase):
         mock_subprocess.assert_not_called()
 
     @patch("charm.Path")
+    @patch("charm.shutil.which")
     @patch("charm.subprocess.run")
     @patch("charm.logger")
     def test_disable_i40e_lldp_with_i40e_nics(
-        self, mock_logger, mock_subprocess, mock_path
+        self, mock_logger, mock_subprocess, mock_which, mock_path
     ):
+        mock_which.return_value = "/usr/sbin/ethtool"
 
         nic_list = ["eth0", "eth1"]
         mock_nics = []
@@ -76,6 +78,35 @@ class TestCharm(unittest.TestCase):
             mock_logger.info.assert_any_call(
                 f"Using ethtool(8) to disable FW lldp for {nic_name}"
             )
+
+    @patch("charm.Path")
+    @patch("charm.shutil.which")
+    @patch("charm.subprocess.run")
+    @patch("charm.logger")
+    def test_disable_i40e_lldp_no_ethtool(
+        self, mock_logger, mock_subprocess, mock_which, mock_path
+    ):
+        mock_which.return_value = None
+
+        nic_list = ["eth0", "eth1"]
+        mock_nics = []
+
+        for nic_name in nic_list:
+            mock_nic = MagicMock()
+            mock_nic.name = nic_name
+            mock_driver = mock_nic / "device/driver"
+            mock_driver.resolve.return_value = Path(
+                "/sys/class/net/{nic_name}/device/driver/i40e"
+            )
+            mock_nics.append(mock_nic)
+
+        mock_path("/sys/class/net").iterdir.return_value = mock_nics
+
+        self.harness.charm.disable_i40e_lldp()
+
+        mock_logger.info.assert_any_call("ethtool not found in PATH")
+
+        mock_subprocess.assert_not_called()
 
     @patch("charm.apt")
     def test_install(self, _apt):
