@@ -29,6 +29,8 @@ jobs:
       - ci-tests
     runs-on: ubuntu-latest
     steps:
+      - name: Setup LXD
+        uses: canonical/setup-lxd@v0.1.3
       - name: Checkout
         uses: actions/checkout@v4
       - name: Select charmhub channel
