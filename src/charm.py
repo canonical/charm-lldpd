@@ -48,14 +48,6 @@ class LldpdCharm(CharmBase):
         self.framework.observe(self.on.install, self.on_upgrade_charm)
         self.framework.observe(self.on.upgrade_charm, self.on_upgrade_charm)
         self.framework.observe(self.on.config_changed, self.on_config_changed)
-        self.framework.observe(
-            self.on.nrpe_external_master_relation_changed,
-            self.on_nrpe_external_master_relation_changed,
-        )
-        self.framework.observe(
-            self.on.nrpe_external_master_relation_joined,
-            self.on_nrpe_external_master_relation_changed,
-        )
 
     def on_upgrade_charm(self, event):
         """Install lldpd package."""
@@ -72,10 +64,6 @@ class LldpdCharm(CharmBase):
         logger.info("Running config-changed")
         self.unit.status = MaintenanceStatus("Updating configuration")
         self.configure()
-
-    def on_nrpe_external_master_relation_changed(self, event):
-        self.setup_nrpe()
-        # TODO get this working for config-changed, but only if relation exists
 
     def install(self):
         apt.update()
@@ -158,10 +146,6 @@ class LldpdCharm(CharmBase):
         shortname = os.uname()[1]
         with open(PATHS["lldpdconf"], "w") as f:
             f.write("configure system hostname {}\n".format(str(shortname)))
-
-    def setup_nrpe(self):
-        ## FIXME use ops-lib-nrpe
-        pass
 
 
 if __name__ == "__main__":

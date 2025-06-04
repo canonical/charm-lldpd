@@ -13,16 +13,15 @@ description: |
   of LLDP packets by default. As such, the use of this LLDP in an environment configured
   with linux bridging may need additional tweaks at the host level.
 
+assumes:
+  - juju >= 3.0
+
 requires:
   juju-info:
     interface: juju-info
     scope: container
   master:
     interface: lldp
-provides:
-  nrpe-external-master:
-    interface: nrpe-external-master
-    scope: container
 subordinate: true
 
 platforms:
