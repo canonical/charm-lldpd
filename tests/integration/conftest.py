@@ -16,12 +16,12 @@
 """Configure lldpd operator integration tests."""
 
 import logging
+import pathlib
 import platform
-from pathlib import Path
+import subprocess
 
+import jubilant
 import pytest
-from pytest_operator.plugin import OpsTest
-
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +49,17 @@ def charm_base(request) -> str:
 
 
 @pytest.fixture(scope="module")
-async def lldpd_charm(ops_test: OpsTest, charm_base: str) -> Path:
-    # Multiple charms will be built, but the build_charm function only returns
-    # the path to one of the charms. Find the charm that matches the charm_base
-    # in order to test the right one.
-    await ops_test.build_charm(".")
+def juju():
+    """Provide a temporary model, torn down at the end of the module."""
+    with jubilant.temp_model(config={"update-status-hook-interval": "10s"}) as juju:
+        yield juju
+
+
+@pytest.fixture(scope="module")
+def lldpd_charm(charm_base: str) -> pathlib.Path:
+    # charmcraft packs one file per platform. Build and return the charm that
+    # matches charm_base so the right one is tested.
+    subprocess.run(["charmcraft", "pack"], check=True)
 
     base = charm_base.replace("@", "-")
     arch = platform.machine()
@@ -61,8 +67,7 @@ async def lldpd_charm(ops_test: OpsTest, charm_base: str) -> Path:
     if arch == "x86_64":
         arch = "amd64"
 
-    build_dir = (ops_test.tmp_path / "charms").absolute()
-    charm_file = build_dir / f"lldpd_{base}-{arch}.charm"
+    charm_file = pathlib.Path(f"lldpd_{base}-{arch}.charm").absolute()
     if not charm_file.exists():
         raise ValueError(f"Unable to find charm file {charm_file}")
 

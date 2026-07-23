@@ -26,6 +26,12 @@ provides:
 subordinate: true
 
 platforms:
+  ubuntu-26.04-amd64:
+    build-on: [ubuntu@26.04:amd64]
+    build-for: [ubuntu@26.04:amd64]
+  ubuntu-26.04-arm64:
+    build-on: [ubuntu@26.04:arm64]
+    build-for: [ubuntu@26.04:arm64]
   ubuntu-24.04-amd64:
     build-on: [ubuntu@24.04:amd64]
     build-for: [ubuntu@24.04:amd64]
@@ -47,5 +53,7 @@ platforms:
 
 parts:
   charm:
-    plugin: charm
+    plugin: uv
     source: .
+    build-snaps:
+      - astral-uv
