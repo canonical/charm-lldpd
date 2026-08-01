@@ -19,16 +19,16 @@
 
 import logging
 import os
-import subprocess
 import shutil
+import subprocess
+from pathlib import Path
 
+from charms.operator_libs_linux.v0 import apt
+from charms.operator_libs_linux.v0.systemd import service_reload
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
 from ops.model import ActiveStatus, MaintenanceStatus
-from charms.operator_libs_linux.v0 import apt
-from charms.operator_libs_linux.v0.systemd import service_reload
-from pathlib import Path
 
 PACKAGES = ["lldpd"]
 PATHS = {
@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 
 class LldpdCharm(CharmBase):
-    """Charm to deploy and manage lldpd"""
+    """Charm to deploy and manage lldpd."""
 
     state = StoredState()
 
@@ -65,7 +65,7 @@ class LldpdCharm(CharmBase):
         self.state.ready = True
 
     def on_config_changed(self, event):
-        """Base config-changed hook."""
+        """Defer configuration changes until the charm is ready."""
         if not self.state.ready:
             event.defer()
             return
@@ -74,19 +74,22 @@ class LldpdCharm(CharmBase):
         self.configure()
 
     def on_nrpe_external_master_relation_changed(self, event):
+        """Handle changes to the NRPE external master relation."""
         self.setup_nrpe()
         # TODO get this working for config-changed, but only if relation exists
 
     def install(self):
+        """Install the lldpd package."""
         apt.update()
         apt.add_package(PACKAGES)
 
     @property
     def machine_id(self):
+        """Return the Juju machine ID, if available."""
         return os.environ.get("JUJU_MACHINE_ID", None)
 
     def configure(self):
-        """Base config-changed hook."""
+        """Configure lldpd."""
         config = self.model.config
 
         # handle the side effects first
@@ -112,7 +115,7 @@ class LldpdCharm(CharmBase):
 
     def disable_i40e_lldp(self):
         """Disable i40e."""
-        I40E_DRIVER_NAME = "i40e"
+        i40e_driver_name = "i40e"
 
         def i40e_filter(path: Path) -> bool:
             """Filter for devices using i40e driver."""
@@ -121,7 +124,7 @@ class LldpdCharm(CharmBase):
             driver = path / "device/driver"
             if not driver.exists() or not driver.is_symlink():
                 return False
-            return I40E_DRIVER_NAME == driver.resolve(strict=True).name
+            return i40e_driver_name == driver.resolve(strict=True).name
 
         nics = [
             device.name
@@ -160,6 +163,7 @@ class LldpdCharm(CharmBase):
             f.write("configure system hostname {}\n".format(str(shortname)))
 
     def setup_nrpe(self):
+        """Set up NRPE monitoring."""
         ## FIXME use ops-lib-nrpe
         pass
 

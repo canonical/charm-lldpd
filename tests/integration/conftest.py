@@ -56,18 +56,24 @@ def juju():
 
 
 @pytest.fixture(scope="module")
-def lldpd_charm(charm_base: str) -> pathlib.Path:
-    # charmcraft packs one file per platform. Build and return the charm that
-    # matches charm_base so the right one is tested.
-    subprocess.run(["charmcraft", "pack"], check=True)
-
-    base = charm_base.replace("@", "-")
+def architecture() -> str:
+    """Get the host architecture in Juju format."""
     arch = platform.machine()
-    # convert the x86_64 arch into the amd64 arch used by charmcraft.
     if arch == "x86_64":
-        arch = "amd64"
+        return "amd64"
+    if arch == "aarch64":
+        return "arm64"
+    return arch
 
-    charm_file = pathlib.Path(f"lldpd_{base}-{arch}.charm").absolute()
+
+@pytest.fixture(scope="module")
+def lldpd_charm(charm_base: str, architecture: str) -> pathlib.Path:
+    base = charm_base.replace("@", "-")
+
+    platform_name = f"{base}-{architecture}"
+    subprocess.run(["charmcraft", "pack", "--platform", platform_name], check=True)
+
+    charm_file = pathlib.Path(f"lldpd_{platform_name}.charm").absolute()
     if not charm_file.exists():
         raise ValueError(f"Unable to find charm file {charm_file}")
 

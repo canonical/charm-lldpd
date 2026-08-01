@@ -28,7 +28,10 @@ NUM_UNITS = 2
 
 @pytest.mark.order(1)
 def test_build_and_deploy(
-    juju: jubilant.Juju, charm_base: str, lldpd_charm: pathlib.Path
+    juju: jubilant.Juju,
+    charm_base: str,
+    architecture: str,
+    lldpd_charm: pathlib.Path,
 ) -> None:
     """Test the lldpd charm builds and deploys."""
     logger.info(f"Building and deploying lldp charms for base: {charm_base}")
@@ -36,7 +39,13 @@ def test_build_and_deploy(
 
     # Deploy the ubuntu principal and the lldpd subordinate. The juju CLI
     # resolves the ubuntu charm revision for the requested base.
-    juju.deploy("ubuntu", "ubuntu", num_units=NUM_UNITS, base=charm_base)
+    juju.deploy(
+        "ubuntu",
+        "ubuntu",
+        num_units=NUM_UNITS,
+        base=charm_base,
+        constraints={"arch": architecture},
+    )
     # lldpd is a subordinate; it takes no units of its own (they come from the
     # principal relation), so num_units is left unset for it.
     juju.deploy(lldpd_charm, "lldpd", base=charm_base)

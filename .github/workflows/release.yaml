@@ -18,17 +18,24 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   ci-tests:
     uses: ./.github/workflows/ci.yaml
 
   release-to-charmhub:
-    name: Release to CharmHub
+    name: Release to CharmHub (${{ matrix.arch }})
     needs:
       - ci-tests
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: write
     steps:
