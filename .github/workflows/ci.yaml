@@ -72,8 +72,16 @@ jobs:
           - ubuntu@22.04
           - ubuntu@24.04
           - ubuntu@26.04
-    name: Integration tests (LXD) | ${{ matrix.bases }}
-    runs-on: ubuntu-latest
+        arch:
+          - amd64
+          - arm64
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    name: Integration tests (LXD) | ${{ matrix.bases }} | ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
     needs:
       - inclusive-naming-check
       - lint
