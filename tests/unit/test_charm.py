@@ -3,13 +3,14 @@
 #
 # Learn more about testing at: https://juju.is/docs/sdk/testing
 
-import unittest
 import os
-from unittest.mock import patch, mock_open, MagicMock, PropertyMock
-
-from charm import LldpdCharm, PACKAGES
-from ops.testing import Harness
+import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, PropertyMock, mock_open, patch
+
+from ops.testing import Harness
+
+from charm import PACKAGES, LldpdCharm
 
 
 class TestCharm(unittest.TestCase):
@@ -155,7 +156,7 @@ class TestCharm(unittest.TestCase):
         svc_reload.assert_called_once()
 
     def test_configure_defaults(self):
-        self._test_configure_helper(dict(), "")
+        self._test_configure_helper({}, "")
 
     def test_configure_no_disable_i40e_lldp(self):
         # disable hooks
