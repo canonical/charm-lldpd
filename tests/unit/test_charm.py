@@ -188,6 +188,51 @@ class TestCharm(unittest.TestCase):
         config = {"enable-snmp": False}
         self._test_configure_helper(config, "")
 
+    def test_configure_cdp_modes(self):
+        modes = {
+            "disabled": "",
+            "auto": "-c",
+            "force-v1": "-cc",
+            "force-v2": "-ccc",
+            "v2-only": "-cccc",
+            "force-v2-only": "-ccccc",
+        }
+        for mode, args in modes.items():
+            with self.subTest(mode=mode):
+                self._test_configure_helper({"cdp-mode": mode}, args)
+
+    def test_configure_sonmp_modes(self):
+        modes = {"disabled": "", "enabled": "-s", "force": "-ss"}
+        for mode, args in modes.items():
+            with self.subTest(mode=mode):
+                self._test_configure_helper({"sonmp-mode": mode}, args)
+
+    def test_configure_edp_modes(self):
+        modes = {"disabled": "", "enabled": "-e", "force": "-ee"}
+        for mode, args in modes.items():
+            with self.subTest(mode=mode):
+                self._test_configure_helper({"edp-mode": mode}, args)
+
+    @patch("charm.service_reload")
+    @patch("charm.LldpdCharm.disable_i40e_lldp")
+    def test_configure_invalid_protocol_mode(self, disable_i40e, service_reload):
+        self.harness.disable_hooks()
+        self.harness.update_config({"cdp-mode": "invalid"})
+        m = mock_open()
+
+        with patch("builtins.open", m):
+            self.harness.charm.configure()
+
+        m.assert_not_called()
+        disable_i40e.assert_not_called()
+        service_reload.assert_not_called()
+        self.assertEqual(self.harness.charm.unit.status.name, "blocked")
+        self.assertEqual(
+            self.harness.charm.unit.status.message,
+            "cdp-mode must be one of: disabled, auto, force-v1, "
+            "force-v2, v2-only, force-v2-only",
+        )
+
     @patch("charm.LldpdCharm.update_short_name")
     def test_configure_enable_short_name(self, _update_short_name):
         with patch(
@@ -203,8 +248,14 @@ class TestCharm(unittest.TestCase):
             self._test_configure_helper(config, "")
 
     def test_configure_multiple_options(self):
-        config = {"interfaces-regex": "eth*", "enable-snmp": True}
-        self._test_configure_helper(config, "-I eth* -x")
+        config = {
+            "interfaces-regex": "eth*",
+            "enable-snmp": True,
+            "cdp-mode": "force-v2-only",
+            "sonmp-mode": "force",
+            "edp-mode": "force",
+        }
+        self._test_configure_helper(config, "-I eth* -x -ccccc -ss -ee")
 
     def test_update_short_name(self):
         hostname = os.uname()[1]

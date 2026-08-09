@@ -27,11 +27,17 @@ due to network bridges for virtual infrastructure not passing through LLDP frame
 
 # Configuration
 
-By default, LLDPd will listen on all interfaces and pick, more or less, a random
-systemid. Two given configuration options allow user to specify which interfaces
-will be used to broadcast LLDP data and which will be used for systemid.
+By default, LLDPd will listen on all interfaces. The interfaces-regex option
+selects which interfaces LLDPd listens on and sends discovery frames from.
+The systemid-from-interface option selects which interfaces LLDPd considers
+when computing the chassis ID.
 
 One additional option, i40e-lldp-stop, is included because some Intel NICs
 block user-space LLDP generated data and instead broadcast their own. By setting
 this option to True (default), NIC's built-in LLDP daemon will be disabled, if
 such a NIC has been discovered on the system.
+
+CDP, SONMP, and EDP support is disabled by default. The cdp-mode option provides
+automatic peer-driven operation, modes that force CDPv1 or CDPv2, and
+peer-driven or forced CDPv2-only operation. The sonmp-mode and edp-mode options
+can enable or force their respective protocols.
