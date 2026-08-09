@@ -35,6 +35,30 @@ options:
     default: False
     description: |
       Enable the SNMP agent for LLDPD
+  cdp-mode:
+    type: string
+    default: "disabled"
+    description: |
+      Configure CDP support. Valid modes are "disabled", "auto",
+      "force-v1", "force-v2", "v2-only", and "force-v2-only".
+      Auto mode advertises each CDP version after a peer using that version
+      is detected. Force-v1 and force-v2 advertise the selected version
+      without a peer while leaving the other version peer-driven. V2-only
+      disables CDPv1, while force-v2-only also forces CDPv2 advertisement.
+  sonmp-mode:
+    type: string
+    default: "disabled"
+    description: |
+      Configure SONMP support. Valid modes are "disabled", "enabled",
+      and "force". Force mode sends SONMP packets even when no SONMP
+      peer is detected.
+  edp-mode:
+    type: string
+    default: "disabled"
+    description: |
+      Configure EDP support. Valid modes are "disabled", "enabled",
+      and "force". Force mode sends EDP packets even when no EDP peer
+      is detected.
   short-name:
     type: boolean
     default: False

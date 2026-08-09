@@ -28,12 +28,24 @@ from charms.operator_libs_linux.v0.systemd import service_reload
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
-from ops.model import ActiveStatus, MaintenanceStatus
+from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus
 
 PACKAGES = ["lldpd"]
 PATHS = {
     "lldpddef": "/etc/default/lldpd",
     "lldpdconf": "/etc/lldpd.conf",
+}
+PROTOCOL_MODE_ARGS = {
+    "cdp-mode": {
+        "disabled": "",
+        "auto": "-c",
+        "force-v1": "-cc",
+        "force-v2": "-ccc",
+        "v2-only": "-cccc",
+        "force-v2-only": "-ccccc",
+    },
+    "sonmp-mode": {"disabled": "", "enabled": "-s", "force": "-ss"},
+    "edp-mode": {"disabled": "", "enabled": "-e", "force": "-ee"},
 }
 logger = logging.getLogger(__name__)
 
@@ -92,6 +104,17 @@ class LldpdCharm(CharmBase):
         """Configure lldpd."""
         config = self.model.config
 
+        protocol_args = []
+        for option, mode_args in PROTOCOL_MODE_ARGS.items():
+            mode = config[option]
+            if mode not in mode_args:
+                self.unit.status = BlockedStatus(
+                    "{} must be one of: {}".format(option, ", ".join(mode_args))
+                )
+                return
+            if mode_args[mode]:
+                protocol_args.append(mode_args[mode])
+
         # handle the side effects first
         if config["i40e-lldp-stop"]:
             self.disable_i40e_lldp()
@@ -105,6 +128,7 @@ class LldpdCharm(CharmBase):
             args.append("-I {}".format(config["interfaces-regex"]))
         if config["enable-snmp"]:
             args.append("-x")
+        args.extend(protocol_args)
         if self.machine_id:
             args.append("-S juju_machine_id={}".format(self.machine_id))
 
