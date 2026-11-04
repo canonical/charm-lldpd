@@ -31,10 +31,12 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          # Pack runs every base, including 20.04, which cannot build on
+          # the 7.0 kernel of ubuntu-24.04 runners (LP: #2148193).
           - arch: amd64
-            runner: ubuntu-24.04
+            runner: ubuntu-22.04
           - arch: arm64
-            runner: ubuntu-24.04-arm
+            runner: ubuntu-22.04-arm
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: write
