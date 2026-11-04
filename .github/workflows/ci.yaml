@@ -65,7 +65,7 @@ jobs:
 
   integration-test:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         bases:
           - ubuntu@20.04
@@ -80,6 +80,15 @@ jobs:
             runner: ubuntu-latest
           - arch: arm64
             runner: ubuntu-24.04-arm
+          # The 7.0 kernel on ubuntu-24.04 runners rejects AppArmor profiles
+          # from focal's apparmor_parser, so snapd cannot start in the 20.04
+          # build instance (LP: #2148193).
+          - bases: ubuntu@20.04
+            arch: amd64
+            runner: ubuntu-22.04
+          - bases: ubuntu@20.04
+            arch: arm64
+            runner: ubuntu-22.04-arm
     name: Integration tests (LXD) | ${{ matrix.bases }} | ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
     needs:
